@@ -7,22 +7,127 @@ package WebService::SonarQube;
 # $Revision$, $Source$, $Date$
 
 use Moo;
+use strict;
 use warnings;
 use version;
 use Carp;
-use Scalar::Util;
-use List::Util;
-#use List::MoreUtils;
-use Data::Dumper qw/Dumper/;
+use namespace::clean;
 use English qw/ -no_match_vars /;
+use WWW::Mechanize;
+use Type::Tiny;
+use Types::Standard -types;
+use URI;
+use WWW::Mechanize;
+use JSON;
 
-extends 'Some::Thing';
+our $VERSION = 0.01;
 
-our $VERSION = version->new('0.0.1');
+has url => (
+    is       => 'rw',
+    required => 1,
+    isa      => Str,
+);
+has [qw/username password/] => (
+    is  => 'rw',
+    isa => Str,
+);
+has mech => (
+    is      => 'rw',
+    default => sub {
+        WWW::Mechanize->new(
+        );
+    },
+);
+has version => (
+    is  => 'rw',
+    isa => Str,
+);
 
+sub BUILD {
+    my ($self) = @_;
 
+    $self->mech->add_header(accept => 'application/json');
 
+    if ($self->url =~ m{/$}) {
+        my $url = $self->url;
+        $url =~ s{/$}{};
+        $self->url($url);
+    }
 
+    my $data = $self->server_index();
+    $self->version($data->{version});
+}
+
+our $AUTOLOAD;
+sub AUTOLOAD {
+    my ($self, %params) = shift;
+
+    my $api =  $AUTOLOAD;
+    $api =~ s{.*::}{};
+    $api =~ s{_}{/}g;
+
+    my $uri = URI->new($self->url . '/api/' . $api);
+    $uri->query_form(
+        map {
+            s/_(.)/uc $1/egxms;
+            ($_ => $params{$_});
+        }
+        keys %params
+    );
+
+    my $mech = $self->mech;
+    $mech->get($uri);
+
+    return decode_json($mech->content || '{}');
+}
+
+sub _apis {
+    return {
+        'api/qualitygates/app' => {
+            version  => '4.3',
+            internal => 1,
+        },
+        'api/qualitygates/copy' => {
+            version => '4.3',
+            input   => {
+                id   => Int,
+                name => Str,
+            },
+        },
+        'api/qualitygates/create' => {
+            version => '4.3',
+            input   => {
+                name => Str,
+            },
+        },
+        'api/qualitygates/create_condition' => {
+            version => '4.3',
+            input   => {
+                error   => Int,
+                gateId  => Int,
+                metric  => Str,
+                op      => Str,
+                period  => Int,
+                warning => Int,
+            },
+        },
+        'api/qualitygates/delete_condition' => {
+            version => '4.3',
+            input   => {
+                id => Int,
+            },
+        },
+        'api/qualitygates/app' => {
+            version  => '4.3',
+        },
+       'api/server/index' => {
+            version => '2.10',
+        },
+       'api/server/setup' => {
+            version => '2.10',
+        },
+    };
+}
 
 1;
 
@@ -34,7 +139,7 @@ WebService::SonarQube - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to WebService::SonarQube version 0.0.1
+This documentation refers to WebService::SonarQube version 0.01
 
 
 =head1 SYNOPSIS
@@ -75,9 +180,6 @@ Param: C<$search> - type (detail) - description
 Return: WebService::SonarQube -
 
 Description:
-
-=cut
-
 
 =head1 DIAGNOSTICS
 
