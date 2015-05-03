@@ -27,20 +27,13 @@ has url => (
     required => 1,
     isa      => Str,
 );
-has [qw/username password/] => (
+has [qw/username password version/] => (
     is  => 'rw',
     isa => Str,
 );
 has mech => (
     is      => 'rw',
-    default => sub {
-        WWW::Mechanize->new(
-        );
-    },
-);
-has version => (
-    is  => 'rw',
-    isa => Str,
+    default => sub { WWW::Mechanize->new(); },
 );
 has commands => (
     is => 'rw',
@@ -59,7 +52,7 @@ sub BUILD {
 
     $self->_get_commands();
 
-    my $server = $self->server_index();
+    my $server = $self->_get('server/index');
     $self->version($server->{version});
 }
 
@@ -67,8 +60,6 @@ sub _get_commands {
     my ($self) = @_;
 
     my $list = $self->_get('webservices/list',  include_internals => 'true');
-    use Data::Dumper qw/Dumper/;
-    warn Dumper $list->{webServices}[0];
 
     my %commands;
     for my $ws (@{ $list->{webServices}}) {
@@ -85,7 +76,7 @@ sub _get_commands {
         }
     }
 
-    die Dumper \%commands
+    $self->commands(\%commands);
 }
 
 our $AUTOLOAD;
@@ -95,6 +86,10 @@ sub AUTOLOAD {
     my $api =  $AUTOLOAD;
     $api =~ s{.*::}{};
     $api =~ s{_}{/}g;
+
+    if (!$self->commands->{api}) {
+        confess "Unknown command $api for SonarQube " . $self->version . '!';
+    }
 
     my $result;
     try {
@@ -117,54 +112,6 @@ sub _get {
     $mech->get($uri);
 
     return decode_json($mech->content || '{}');
-}
-
-sub _apis {
-    return {
-        'api/qualitygates/app' => {
-            version  => '4.3',
-            internal => 1,
-        },
-        'api/qualitygates/copy' => {
-            version => '4.3',
-            input   => {
-                id   => Int,
-                name => Str,
-            },
-        },
-        'api/qualitygates/create' => {
-            version => '4.3',
-            input   => {
-                name => Str,
-            },
-        },
-        'api/qualitygates/create_condition' => {
-            version => '4.3',
-            input   => {
-                error   => Int,
-                gateId  => Int,
-                metric  => Str,
-                op      => Str,
-                period  => Int,
-                warning => Int,
-            },
-        },
-        'api/qualitygates/delete_condition' => {
-            version => '4.3',
-            input   => {
-                id => Int,
-            },
-        },
-        'api/qualitygates/app' => {
-            version  => '4.3',
-        },
-       'api/server/index' => {
-            version => '2.10',
-        },
-       'api/server/setup' => {
-            version => '2.10',
-        },
-    };
 }
 
 1;
