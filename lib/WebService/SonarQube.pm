@@ -67,7 +67,7 @@ sub _get_commands {
         $name =~ s{^api/}{};
 
         for my $action (@{ $ws->{actions} }) {
-            $commands{$name . '_' . $action->{key}} = {
+            $commands{$name . '/' . $action->{key}} = {
                 name     => $name . '_' . $action->{key},
                 url      => $name . '/' . $action->{key},
                 internal => !!$action->{internal},
@@ -87,7 +87,7 @@ sub AUTOLOAD {
     $api =~ s{.*::}{};
     $api =~ s{_}{/}g;
 
-    if (!$self->commands->{api}) {
+    if (!$self->commands->{$api}) {
         confess "Unknown command $api for SonarQube " . $self->version . '!';
     }
 
