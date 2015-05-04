@@ -97,7 +97,7 @@ sub AUTOLOAD {
     }
     catch {
         confess "Errored trying $AUTOLOAD()\n$_\n";
-    }
+    };
 
     return $result;
 }
