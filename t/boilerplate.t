@@ -58,5 +58,6 @@ subtest 'Changes' => sub {
     );
 };
 
+module_boilerplate_ok('bin/ws-sonar');
 module_boilerplate_ok('lib/WebService/SonarQube.pm');
 done_testing();
