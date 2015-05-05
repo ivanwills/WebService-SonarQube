@@ -159,6 +159,20 @@ Simple interface to accessing SonarQube's web API.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 C<BUILD>
+
+Internal method which constructs some internal properties
+
+=head2 C<commands ()>
+
+Returns the list of API commands that the server supports
+
+=head2 C<mech ()>
+
+Returns the internal L<WWW::Mechanize> object
+
+=head2 API COMMANDS
+
 POST api/action_plans/close
 POST api/action_plans/create
 POST api/action_plans/delete
