@@ -81,7 +81,7 @@ sub _get_commands {
 
 our $AUTOLOAD;
 sub AUTOLOAD {
-    my ($self, %params) = shift;
+    my ($self, %params) = @_;
 
     my $api =  $AUTOLOAD;
     $api =~ s{.*::}{};
@@ -93,10 +93,14 @@ sub AUTOLOAD {
 
     my $result;
     try {
-        $result = $self->_get($api, %params);
+        $result = $self->commands->{$api}{post} ? $self->_post($api, %params) : $self->_get($api, %params);
     }
     catch {
-        confess "Errored trying $AUTOLOAD()\n$_\n";
+        local $Data::Dumper::Indent = 0;
+        require Data::Dumper;
+        my $args = Data::Dumper::Dumper( \%params );
+        $args = s/^\$VAR\d\s+=\s+//;
+        confess "Errored trying $AUTOLOAD($args)\n$_\n";
     };
 
     return $result;
@@ -110,6 +114,17 @@ sub _get {
     $uri->query_form(%params);
 
     $mech->get($uri);
+
+    return decode_json($mech->content || '{}');
+}
+
+sub _post {
+    my ($self, $api, %params) = @_;
+
+    my $mech = $self->mech;
+    my $uri = URI->new($self->url . '/api/' . $api);
+
+    $mech->post($uri, \%params);
 
     return decode_json($mech->content || '{}');
 }
