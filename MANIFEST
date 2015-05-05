@@ -1,4 +1,4 @@
-
+bin/ws-sonar
 Build.PL
 Changes
 lib/WebService/SonarQube.pm
@@ -7,7 +7,7 @@ Makefile.PL
 MANIFEST
 META.json
 META.yml
-README
+README.pod
 t/00-load.t
 t/boilerplate.t
 t/critic.t
@@ -17,3 +17,4 @@ t/perlcriticrc
 t/pod-coverage.t
 t/pod.t
 t/spelling.t
+ws.pl

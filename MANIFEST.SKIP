@@ -61,3 +61,6 @@ Debian_CPANTS.txt
 
 # Avoid archives of this distribution
 \bWebService-SonarQube-[\d\.\_]+
+^MYMETA\.json$
+.*.tag
+.travis.yml
