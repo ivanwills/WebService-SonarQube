@@ -91,6 +91,16 @@ sub AUTOLOAD {
         confess "Unknown command $api for SonarQube " . $self->version . '!';
     }
 
+    my $url = $self->url;
+    $url =~ s{//(?:[^@]+[@])}{//};
+
+    if ($self->username && $self->password) {
+        $self->mech->credentials($self->username, $self->password);
+        my ($user, $pass) = ($self->username, $self->password);
+        $url =~ s{//}{//$user\:$pass\@};
+    }
+    $self->url($url);
+
     my $result;
     try {
         $result = $self->commands->{$api}{post} ? $self->_post($api, %params) : $self->_get($api, %params);
