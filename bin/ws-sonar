@@ -61,6 +61,7 @@ sub main {
     my $sonar = WebService::SonarQube->new(%option);
 
     my $call = shift @ARGV;
+    $call =~ s{^api/}{};
     $call =~ s{/}{_}g;
 
     my %params = map {
@@ -86,7 +87,7 @@ __DATA__
 
 =head1 NAME
 
-ws-sonar - <One-line description of commands purpose>
+ws-sonar - Execute a SonarQube API command
 
 =head1 VERSION
 
@@ -94,9 +95,15 @@ This documentation refers to ws-sonar version 0.0.1
 
 =head1 SYNOPSIS
 
-   ws-sonar [option]
+   ws-sonar [option] api_command [key=value ...]
 
  OPTIONS:
+  api_command   Is one of the web service api calls supported by the
+                SonarQube instance specified in --url.
+                eg: api/server/index or webservices/list
+  key=value     Any parameters that "api_command" needs can be specified
+                via key=value pairs.
+
   -u --url[=]string
                 The base url to access SonarQube
   -U --username[=]string
