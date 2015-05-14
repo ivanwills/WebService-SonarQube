@@ -16,6 +16,8 @@ my $sonar = WebService::SonarQube->new(
 );
 
 setup();
+good_commands();
+bad_command();
 done_testing();
 
 sub setup {
@@ -26,6 +28,23 @@ sub setup {
         mech => init(),
     );
     is $url, $sonar->url, "Trailing slash (/) is removed";
+}
+
+sub good_commands {
+    $mech->data([
+        'http://localhost/sonar/api/qualitygates/show?name=My+Gate' => '{"id":1,"name":"SonarQube way","conditions":[{"id":1,"metric":"blocker_violations","op":"GT","error":"0"}]}',
+    ]);
+    my $ans = eval { $sonar->qualitygates_show( name => "My Gate" ) };
+    my $error = $@;
+    ok !$error, "No error show quality gate" or diag $error;
+    is_deeply $ans, {id => 1, name => "SonarQube way", conditions => [{id => 1, metric => "blocker_violations", op => "GT", error => "0"}]};
+}
+
+sub bad_command {
+    my $ans = eval { $sonar->non_existant() };
+    my $error = $@;
+    like $error, qr{Unknown command non/existant for SonarQube 4.5.4}, "Error when trying random method"
+        or diag explain $ans, $error;
 }
 
 my $ws;
