@@ -18,6 +18,7 @@ my $sonar = WebService::SonarQube->new(
 setup();
 good_commands();
 bad_command();
+error_command();
 done_testing();
 
 sub setup {
@@ -38,12 +39,51 @@ sub good_commands {
     my $error = $@;
     ok !$error, "No error show quality gate" or diag $error;
     is_deeply $ans, {id => 1, name => "SonarQube way", conditions => [{id => 1, metric => "blocker_violations", op => "GT", error => "0"}]};
+
+    $mech->data([
+        'http://localhost/sonar/api/qualitygates/show?name=My+Gate' => '',
+    ]);
+    $ans = eval { $sonar->qualitygates_show( name => "My Gate" ) };
+    $error = $@;
+    ok !$error, "No error show quality gate" or diag $error;
+    is_deeply $ans, {};
+
+    $mech->data([
+        'http://localhost/sonar/api/qualitygates/select' => '',
+    ]);
+    $sonar->username('admin');
+    $ans = eval { $sonar->qualitygates_select( gateId => 1, projectId => 1 ) };
+    $error = $@;
+    ok !$error, "No error show quality gate" or diag $error;
+    is_deeply $ans, {};
+
+    $mech->data([
+        'http://admin:admin@localhost/sonar/api/qualitygates/select' => '{}',
+    ]);
+    $sonar->password('admin');
+    $ans = eval { $sonar->qualitygates_select( gateId => 1, projectId => 1 ) };
+    $error = $@;
+    ok !$error, "No error show quality gate" or diag $error;
+    is_deeply $ans, {};
+
 }
 
 sub bad_command {
     my $ans = eval { $sonar->non_existant() };
     my $error = $@;
     like $error, qr{Unknown command non/existant for SonarQube 4.5.4}, "Error when trying random method"
+        or diag explain $ans, $error;
+}
+
+sub error_command {
+    $mech->data([
+        'http://admin:admin@localhost/sonar/api/qualitygates/select' => sub {
+            die "Return error";
+        },
+    ]);
+    my $ans = eval { $sonar->qualitygates_select() };
+    my $error = $@;
+    like $error, qr{Errored trying WebService::SonarQube::qualitygates_select[(][)]}, "Error from server"
         or diag explain $ans, $error;
 }
 

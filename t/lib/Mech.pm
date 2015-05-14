@@ -36,6 +36,10 @@ sub post { shift->get(@_) }
 sub content {
     my ($self) = @_;
 
+    if ( ref $self->data->[0] ) {
+        return (shift @{ $self->data })->();
+    }
+
     return shift @{ $self->data };
 }
 
