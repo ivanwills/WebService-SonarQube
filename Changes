@@ -1,5 +1,14 @@
 Revision history for WebService-SonarQube
 
+0.02   2015-06-05
+        Updating for release of version 0.02
+        Got test coverage to 100% (Ivan Wills)
+        Added good and bad command tests (Ivan Wills)
+        Added new files to manifest (Ivan Wills)
+        Starting to do tests (Ivan Wills)
+        Added ignoring temp files (Ivan Wills)
+        Added documentation for ws-sonar (Ivan Wills)
+
 0.01    2015-05-05
         First version, released on an unsuspecting world.
 
