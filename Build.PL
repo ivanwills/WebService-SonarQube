@@ -15,7 +15,7 @@ my $builder = Module::Build->new(
         'Try::Tiny'        => '0.22',
         'Type::Tiny'       => '1.000005',
         'Types::Standard'  => '1.000005',
-        'URI'              => '1.65',
+        'URI'              => '1.64',
         'WWW::Mechanize'   => '1.73',
         'namespace::clean' => '0.25',
     },
