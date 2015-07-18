@@ -1,5 +1,11 @@
 Revision history for WebService-SonarQube
 
+0.03   2015-07-18
+        Updating for release of version 0.03
+        Lowered URI min version requirement (Ivan Wills)
+        Added coveralls config (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
 0.02   2015-06-05
         Updating for release of version 0.02
         Got test coverage to 100% (Ivan Wills)
