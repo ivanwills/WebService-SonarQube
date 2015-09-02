@@ -95,8 +95,8 @@ sub AUTOLOAD {
     $url =~ s{//(?:[^@]+[@])}{//};
 
     if ($self->username && $self->password) {
-        $self->mech->credentials($self->username, $self->password);
-        my ($user, $pass) = ($self->username, $self->password);
+        $self->mech->credentials(_url_encode($self->username), _url_encode($self->password));
+        my ($user, $pass) = map {_url_encode($_)} ($self->username, $self->password);
         $url =~ s{//}{//$user\:$pass\@};
     }
     $self->url($url);
@@ -138,6 +138,12 @@ sub _post {
 
     return decode_json($mech->content || '{}');
 }
+
+sub _url_encode {
+    my ($str) = @_;
+    $str =~ s/(\W)/sprintf('%%%x',ord($1))/eg;
+    return $str;
+};
 
 1;
 
