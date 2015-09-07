@@ -3,7 +3,6 @@ Build.PL
 Changes
 lib/WebService/SonarQube.pm
 LICENSE
-Makefile.PL
 MANIFEST
 META.json
 META.yml
