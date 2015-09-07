@@ -1,5 +1,9 @@
 Revision history for WebService-SonarQube
 
+0.05   2015-09-07
+        Updating for release of version 0.05
+        Removed creation of makefile (Ivan Wills)
+
 0.04   2015-09-06
         Updating for release of version 0.04
         Added encoding usernames and passwords incase they contain special characters (Ivan Wills)

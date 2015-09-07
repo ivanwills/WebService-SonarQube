@@ -20,7 +20,7 @@ use WWW::Mechanize;
 use JSON;
 use Try::Tiny;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has url => (
     is       => 'rw',
@@ -155,7 +155,7 @@ WebService::SonarQube - API for talking to SonarQube
 
 =head1 VERSION
 
-This documentation refers to WebService::SonarQube version 0.04
+This documentation refers to WebService::SonarQube version 0.05
 
 =head1 SYNOPSIS
 
