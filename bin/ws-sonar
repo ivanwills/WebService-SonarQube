@@ -40,6 +40,7 @@ sub main {
         'url|u=s',
         'username|U=s',
         'password|P=s',
+        'list|l',
         'verbose|v+',
         'man',
         'help',
@@ -59,6 +60,33 @@ sub main {
 
     # do stuff here
     my $sonar = WebService::SonarQube->new(%option);
+
+    if ($option{list}) {
+        if ($option{verbose}) {
+            my $api = $sonar->webservices_list(include_internals=>'true');
+            for my $ws (@{ $api->{webServices} }) {
+                if (!$ws->{description}) {
+                    $ws->{description} = $ws->{path};
+                    $ws->{description} =~ s/^api.//;
+                }
+                print "\n$ws->{description}:\n";
+                for my $action (@{ $ws->{actions} }) {
+                    print "  $action->{description}\n" if $action->{description};
+                    print "    $ws->{path}/$action->{key}\n";
+                }
+            }
+        }
+        else {
+            my $max = 10;
+            for my $ws (keys %{ $sonar->commands }) {
+                $max = length $ws if length $ws > $max;
+            }
+            for my $ws (sort keys %{ $sonar->commands }) {
+                printf "%${max}s %s\n", $ws, $sonar->commands->{$ws}->{description} || '';
+            }
+        }
+        return;
+    }
 
     my $call = shift @ARGV;
     $call =~ s{^api/}{};
