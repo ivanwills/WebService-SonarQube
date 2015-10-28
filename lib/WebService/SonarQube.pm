@@ -72,6 +72,7 @@ sub _get_commands {
                 url      => $name . '/' . $action->{key},
                 internal => !!$action->{internal},
                 post     => !!$action->{post},
+                description => $action->{description} || '',
             };
         }
     }
