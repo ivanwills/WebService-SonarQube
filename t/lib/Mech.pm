@@ -12,7 +12,7 @@ use warnings;
 use Carp;
 use English qw/ -no_match_vars /;
 
-our $VERSION     = 0.05;
+our $VERSION     = 0.06;
 
 has headers => (is => 'rw', default => sub {{}} );
 has data    => (is => 'rw', default => sub {[]} );
