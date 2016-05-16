@@ -19,6 +19,8 @@ setup();
 good_commands();
 bad_command();
 error_command();
+urls();
+
 done_testing();
 
 sub setup {
@@ -85,6 +87,10 @@ sub error_command {
     my $error = $@;
     like $error, qr{Errored trying WebService::SonarQube::qualitygates_select[(][)]}, "Error from server"
         or diag explain $ans, $error;
+}
+
+sub urls {
+    is WebService::SonarQube::_url_encode('@'), '%40', 'Encode @ correctly';
 }
 
 my $ws;
