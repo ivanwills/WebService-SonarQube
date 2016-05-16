@@ -1,18 +1,27 @@
---- 
+---
 count: 6
-default: 
+default:
   restart: 0
   wait: 0
-editor: 
-  files: 
-    eg: 
-      - some-file.eg
+editor:
+  files:
+    bin:
+      - bin/*
 name: ws-sonar
-terminals: 
-  2: []
-
-  3: []
-
+terminals:
+  1a:
+    command: ./Build && ./Build testcover
+    restart: 1
+    wait: 0
+    watch:
+      - lib
+      - bin
+      - tests
+  2:
+    edit: lib
+  3:
+    restart: 1
+    edit: bin
   4: []
 
   5: []
