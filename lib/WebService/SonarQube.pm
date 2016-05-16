@@ -88,6 +88,8 @@ sub AUTOLOAD {
     $api =~ s{.*::}{};
     $api =~ s{_}{/}g;
 
+    return if $api eq 'DESTROY';
+
     if (!$self->commands->{$api}) {
         confess "Unknown command $api for SonarQube " . $self->version . '!';
     }
