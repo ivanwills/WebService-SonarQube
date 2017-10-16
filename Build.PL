@@ -20,8 +20,8 @@ my $builder = Module::Build->new(
         'namespace::clean' => '0.25',
     },
     build_requires => {
-        'Test::More'     => 0,
-        'Test::Warnings' => 0,
+        'Test::More'     => '0.88',
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'WebService-SonarQube-*' ],
     create_license     => 1,
