@@ -53,7 +53,7 @@ Mech - <One-line description of module's purpose>
 
 =head1 VERSION
 
-This documentation refers to Mech version 0.0.1
+This documentation refers to Mech version 0.09
 
 
 =head1 SYNOPSIS
