@@ -96,9 +96,15 @@ sub AUTOLOAD {
 
     return if $api eq 'DESTROY';
 
+    if ( ! $self ) {
+        confess "Why am I being called?\n";
+    }
+
     if (!$self->commands->{$api}) {
         confess "Unknown command $api for SonarQube " . $self->version . '!';
     }
+
+    my $command = $self->commands->{$api};
 
     my $url = $self->url;
     $url =~ s{//(?:[^@]+[@])}{//};
@@ -110,16 +116,39 @@ sub AUTOLOAD {
     }
     $self->url($url);
 
+    for my $param (keys %params) {
+        my $values = $command->{params}{$param};
+        my $desc = $values->{description};
+        $desc =~ s{<\/?(ul|li)>}{\n  * }gxms;
+
+        if ( ! $values ) {
+            confess "Unknown parameter $param!\n$desc\n";
+        }
+        if ( $values->{possibleValues} && ! grep {$params{$param} eq $_ } @{ $values->{possibleValues} } ) {
+            confess "$param must contain one of:\n" . (join "\n", @{ $values->{possibleValues} }) . "\n$desc\n";
+        }
+    }
+    for my $param (keys %{ $command->{params} }) {
+        my $desc = $command->{params}{$param}{description};
+        $desc =~ s{</?ul>}{\n}gxms;
+        $desc =~ s{<li>}{\n  * }gxms;
+        $desc =~ s{</li>}{}gxms;
+
+        if ( $command->{params}{$param}{required} && ! $params{$param} ) {
+            confess "$param is required!\n$desc\n";
+        }
+    }
+
     my $result;
     try {
-        $result = $self->commands->{$api}{post} ? $self->_post($api, %params) : $self->_get($api, %params);
+        $result = $command->{post} ? $self->_post($api, %params) : $self->_get($api, %params);
     }
     catch {
         local $Data::Dumper::Indent = 0;
         require Data::Dumper;
         my $args = Data::Dumper::Dumper( \%params );
         $args = s/^\$VAR\d\s+=\s+//;
-        confess "Errored trying $AUTOLOAD($args)\n$_\n";
+        confess "Errored trying " . ( $command->{post} ? 'POST' : 'GET' ) . " on $AUTOLOAD($args)\n$_\n";
     };
 
     return $result;
