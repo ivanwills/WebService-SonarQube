@@ -52,8 +52,13 @@ sub BUILD {
 
     $self->_get_commands();
 
-    my $server = $self->_get('server/index');
-    $self->version($server->{version});
+    eval {
+        my $server = $self->_get('server/index');
+        $self->version($server->{version});
+        $server->{version};
+    } or do {
+        $self->version('unknown');
+    };
 }
 
 sub _get_commands {
@@ -73,6 +78,7 @@ sub _get_commands {
                 internal => !!$action->{internal},
                 post     => !!$action->{post},
                 description => $action->{description},
+                params   => { map {$_->{key} => $_} @{$action->{params}} },
             };
         }
     }
