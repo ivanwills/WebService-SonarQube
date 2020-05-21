@@ -86,6 +86,39 @@ sub _get_commands {
     $self->commands(\%commands);
 }
 
+sub help {
+    my ($self, $api) = @_;
+    if (! $api ) {
+        confess "No api supplied for help!";
+    }
+
+    $api =~ s{.*::}{};
+    $api =~ s{_}{/}g;
+    my $command = $self->commands->{$api};
+
+    if (!$command) {
+        confess "Can't find the API $api";
+    }
+
+    print "$api\n";
+    my $max = 1;
+    for my $param (keys %{ $command->{params} }) {
+        if (length $param > $max) {
+            $max = length $param;
+        }
+    }
+    for my $param (sort keys %{ $command->{params} }) {
+        my $desc = $command->{params}{$param}{description};
+        $desc =~ s{</?ul>}{\n}gxms;
+        $desc =~ s{<li>}{\n    * }gxms;
+        $desc =~ s{</li>}{}gxms;
+        $desc =~ s{\n\n}{\n}gxms;
+        chomp $desc;
+
+        printf "  %-${max}s - %s\n", $param, $desc;
+    }
+}
+
 our $AUTOLOAD;
 sub AUTOLOAD {
     my ($self, %params) = @_;
@@ -118,7 +151,7 @@ sub AUTOLOAD {
 
     for my $param (keys %params) {
         my $values = $command->{params}{$param};
-        my $desc = $values->{description};
+        my $desc = $values->{description} || '';
         $desc =~ s{<\/?(ul|li)>}{\n  * }gxms;
 
         if ( ! $values ) {

@@ -54,6 +54,14 @@ sub main {
     elsif ( $option{'man'} ) {
         pod2usage( -verbose => 2 );
     }
+    elsif ( $option{'help'} && $ARGV[0] =~ /^\w+\/\w+$/) {
+        my $sonar = WebService::SonarQube->new(%option);
+        my $call = shift @ARGV;
+        $call =~ s{^api/}{};
+        $call =~ s{/}{_}g;
+        $sonar->help($call);
+        exit 0;
+    }
     elsif ( $option{'help'} ) {
         pod2usage( -verbose => 1 );
     }
