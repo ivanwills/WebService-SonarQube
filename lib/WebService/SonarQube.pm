@@ -168,7 +168,7 @@ sub AUTOLOAD {
         $desc =~ s{</li>}{}gxms;
 
         if ( $command->{params}{$param}{required} && ! $params{$param} ) {
-            confess "$param is required!\n$desc\n";
+            confess "$param is required for $api!\n$desc\n";
         }
     }
 

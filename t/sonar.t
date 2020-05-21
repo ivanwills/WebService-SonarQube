@@ -85,7 +85,7 @@ sub error_command {
     ]);
     my $ans = eval { $sonar->qualitygates_select() };
     my $error = $@;
-    like $error, qr{Errored trying WebService::SonarQube::qualitygates_select[(][)]}, "Error from server"
+    like $error, qr{projectId is required for qualitygates/select}, "Error about parameters"
         or diag explain $ans, $error;
 }
 
